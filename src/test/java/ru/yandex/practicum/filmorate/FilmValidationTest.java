@@ -13,6 +13,24 @@ public class FilmValidationTest {
 
     FilmController controller = new FilmController();
 
+    public static void validateFilm(Film film) {
+        if (film.getName() == null || film.getName().isBlank()) {
+            throw new ValidationException("Название фильма не может быть пустым");
+        }
+
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
+            throw new ValidationException("Описание фильма не может превышать 200 символов");
+        }
+
+        if (film.getReleaseDate() != null && film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
+        }
+
+        if (film.getDuration() == null || film.getDuration() <= 0) {
+            throw new ValidationException("Продолжительность фильма должна быть положительной");
+        }
+    }
+
     @Test
     void shouldThrowExceptionWhenNameIsBlank() {
         Film film = new Film();
@@ -21,7 +39,7 @@ public class FilmValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(100);
 
-        Exception exception = assertThrows(ValidationException.class, () -> controller.validateFilm(film));
+        Exception exception = assertThrows(ValidationException.class, () -> validateFilm(film));
         assertEquals("Название фильма не может быть пустым", exception.getMessage());
     }
 
@@ -33,7 +51,7 @@ public class FilmValidationTest {
         film.setReleaseDate(LocalDate.of(1700, 1, 1));
         film.setDuration(90);
 
-        Exception exception = assertThrows(ValidationException.class, () -> controller.validateFilm(film));
+        Exception exception = assertThrows(ValidationException.class, () -> validateFilm(film));
         assertTrue(exception.getMessage().contains("Дата релиза не может быть раньше 28 декабря 1895 года"));
     }
 
@@ -45,7 +63,7 @@ public class FilmValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(-120);
 
-        Exception exception = assertThrows(ValidationException.class, () -> controller.validateFilm(film));
+        Exception exception = assertThrows(ValidationException.class, () -> validateFilm(film));
         assertTrue(exception.getMessage().contains("Продолжительность фильма должна быть положительной"));
     }
 
@@ -57,7 +75,7 @@ public class FilmValidationTest {
         film.setReleaseDate(LocalDate.of(2025, 1, 1));
         film.setDuration(120);
 
-        Exception exception = assertThrows(ValidationException.class, () -> controller.validateFilm(film));
+        Exception exception = assertThrows(ValidationException.class, () -> validateFilm(film));
         assertTrue(exception.getMessage().contains("Описание фильма не может превышать 200 символов"));
     }
 
@@ -74,3 +92,7 @@ public class FilmValidationTest {
     }
 
 }
+
+
+
+

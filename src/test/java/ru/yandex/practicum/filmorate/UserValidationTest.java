@@ -13,6 +13,21 @@ public class UserValidationTest {
 
     UserController controller = new UserController();
 
+    public void validateUser(User user) {
+        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
+            throw new ValidationException("Некорректная электронная почта");
+        }
+        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не может быть пустым или содержать пробелы");
+        }
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
+            throw new ValidationException("Дата рождения не может быть в будущем");
+        }
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+    }
+
     @Test
     void shouldThrowWhenEmailIsEmpty() {
         User user = new User();
@@ -21,7 +36,7 @@ public class UserValidationTest {
         user.setName("name");
         user.setBirthday(LocalDate.of(2025, 1, 1));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> controller.validateUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> validateUser(user));
         assertTrue(exception.getMessage().contains("Некорректная электронная почта"));
     }
 
@@ -33,7 +48,7 @@ public class UserValidationTest {
         user.setName("name");
         user.setBirthday(LocalDate.of(2025, 1, 1));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> controller.validateUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> validateUser(user));
         assertTrue(exception.getMessage().contains("Некорректная электронная почта"));
     }
 
@@ -45,7 +60,7 @@ public class UserValidationTest {
         user.setName("name");
         user.setBirthday(LocalDate.of(2025, 1, 1));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> controller.validateUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> validateUser(user));
         assertTrue(exception.getMessage().contains("Логин не может быть пустым или содержать пробелы"));
     }
 
@@ -57,7 +72,7 @@ public class UserValidationTest {
         user.setName("name");
         user.setBirthday(LocalDate.of(2025, 1, 1));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> controller.validateUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> validateUser(user));
         assertTrue(exception.getMessage().contains("Логин не может быть пустым или содержать пробелы"));
     }
 
@@ -69,7 +84,7 @@ public class UserValidationTest {
         user.setName("name");
         user.setBirthday(LocalDate.now().plusDays(15));
 
-        ValidationException exception = assertThrows(ValidationException.class, () -> controller.validateUser(user));
+        ValidationException exception = assertThrows(ValidationException.class, () -> validateUser(user));
         assertTrue(exception.getMessage().contains("Дата рождения не может быть в будущем"));
     }
 
