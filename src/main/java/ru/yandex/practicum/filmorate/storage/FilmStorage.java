@@ -10,7 +10,10 @@ import java.util.List;
 
 public interface FilmStorage {
     Film addFilm(@RequestBody @Validated(OnCreate.class) Film film);
+
     Film updateFilm(@RequestBody @Validated(OnUpdate.class) Film updatedFilm);
+
     List<Film> getAllFilms();
+
     Film getFilm(Long id);
 }

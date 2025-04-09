@@ -10,7 +10,10 @@ import java.util.List;
 
 public interface UserStorage {
     User createUser(@RequestBody @Validated(OnCreate.class) User user);
+
     User updateUser(@RequestBody @Validated(OnUpdate.class) User updatedUser);
+
     List<User> getAllUsers();
+
     User getUser(Long id);
 }
