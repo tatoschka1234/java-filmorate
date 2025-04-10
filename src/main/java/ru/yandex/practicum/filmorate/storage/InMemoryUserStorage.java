@@ -52,4 +52,9 @@ public class InMemoryUserStorage implements UserStorage {
         }
         return user;
     }
+
+    @Override
+    public boolean checkUserExists(Long id) {
+        return users.containsKey(id);
+    }
 }

@@ -4,10 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -51,6 +49,14 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new RuntimeException("Фильм с id " + id + " не найден");
         }
         return film;
+    }
+
+    public List<Film> getMostPopular(int count) {
+        return films.values().stream()
+                .peek(f -> System.out.println(f.getClass()))
+                .sorted(Comparator.comparingInt((Film f) -> f.getLikes().size()).reversed())
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
 }

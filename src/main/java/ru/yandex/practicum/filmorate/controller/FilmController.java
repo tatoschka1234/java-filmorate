@@ -4,14 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.validation.OnCreate;
 import ru.yandex.practicum.filmorate.validation.OnUpdate;
 
-import java.time.LocalDate;
 import java.util.List;
 
 
@@ -20,25 +17,21 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    private final FilmStorage filmStorage;
     private final FilmService filmService;
 
     @PostMapping
     public Film addFilm(@RequestBody @Validated(OnCreate.class) Film film) {
-        log.info("Получен запрос на добавление фильма");
-        validateFilm(film);
-        return filmStorage.addFilm(film);
+        return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody @Validated(OnUpdate.class) Film updatedFilm) {
-        validateFilm(updatedFilm);
-        return filmStorage.updateFilm(updatedFilm);
+        return filmService.updateFilm(updatedFilm);
     }
 
     @GetMapping
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        return filmService.getAllFilms();
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -61,10 +54,4 @@ public class FilmController {
         return filmService.getFilmById(id);
     }
 
-    public void validateFilm(Film film) {
-        log.debug("проверка фильма с id {}", film.getId());
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-    }
 }
