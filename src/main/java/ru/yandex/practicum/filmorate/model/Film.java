@@ -6,6 +6,8 @@ import ru.yandex.practicum.filmorate.validation.OnCreate;
 import ru.yandex.practicum.filmorate.validation.OnUpdate;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -29,4 +31,6 @@ public class Film {
 
     @Positive(message = "Продолжительность должна быть положительной", groups = {OnCreate.class, OnUpdate.class})
     private Integer duration;
+
+    private Set<Long> likes = new HashSet<>();
 }
