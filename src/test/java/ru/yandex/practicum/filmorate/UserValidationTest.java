@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -10,8 +9,6 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserValidationTest {
-
-    UserController controller = new UserController();
 
     public void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
@@ -96,6 +93,6 @@ public class UserValidationTest {
         user.setName("name");
         user.setBirthday(LocalDate.of(2025, 1, 1));
 
-        assertDoesNotThrow(() -> controller.validateUser(user));
+        assertDoesNotThrow(() -> validateUser(user));
     }
 }
