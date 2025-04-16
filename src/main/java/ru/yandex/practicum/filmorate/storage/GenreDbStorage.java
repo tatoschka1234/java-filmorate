@@ -31,6 +31,9 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     public List<Long> findExistingGenreIds(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        }
         String inSql = String.join(",", Collections.nCopies(ids.size(), "?"));
         String sql = "SELECT genre_id FROM genres WHERE genre_id IN (" + inSql + ")";
         return jdbcTemplate.queryForList(sql, ids.toArray(), Long.class);

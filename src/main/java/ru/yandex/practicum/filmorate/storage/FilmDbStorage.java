@@ -99,15 +99,15 @@ public List<Film> getAllFilms() {
         FROM films f
         LEFT JOIN ratings r ON f.rating_id = r.rating_id
         WHERE f.film_id = ?
-        """;
+    """;
 
         Film film = jdbcTemplate.queryForObject(sql, new FilmRowMapper(), id);
-
-        Set<Genre> genres = genreStorage.getGenresForFilm(film.getId());
-        film.setGenres(genres);
+        Map<Long, Set<Genre>> genreMap = genreStorage.getGenresForFilms(List.of(id));
+        film.setGenres(genreMap.getOrDefault(id, new HashSet<>()));
 
         return film;
     }
+
 
 
     @Override
