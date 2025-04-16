@@ -166,6 +166,13 @@ public List<Film> getAllFilms() {
         jdbcTemplate.update(sql, filmId, userId);
     }
 
+    @Override
+    public boolean checkFilmExists(Long id) {
+        String sql = "SELECT COUNT(*) FROM films WHERE film_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
+        return count != null && count > 0;
+    }
+
 
 }
 

@@ -41,7 +41,9 @@ public class FilmService {
 
 
     public void addLike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilm(filmId);
+        if (!filmStorage.checkFilmExists(filmId)) {
+            throw new NotFoundException("Фильм с id=" + filmId + " не найден");
+        }
         if (!userStorage.checkUserExists(userId)) {
                 throw new RuntimeException("юзер с id " + userId + " не найден");
         }
@@ -49,7 +51,9 @@ public class FilmService {
     }
 
     public void removeLike(Long filmId, Long userId) {
-        Film film = filmStorage.getFilm(filmId); // todo
+        if (!filmStorage.checkFilmExists(filmId)) {
+            throw new NotFoundException("Фильм с id=" + filmId + " не найден");
+        }
         if (!userStorage.checkUserExists(userId)) {
             throw new RuntimeException("юзер с id " + userId + " не найден");
         }
