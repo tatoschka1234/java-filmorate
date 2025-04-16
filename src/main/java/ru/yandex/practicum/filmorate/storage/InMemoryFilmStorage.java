@@ -59,4 +59,24 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void addLike(Long filmId, Long userId) {
+        Film film = films.get(filmId);
+        if (film != null) {
+            film.getLikes().add(userId);
+        } else {
+            throw new RuntimeException("Фильм с id=" + filmId + " не найден");
+        }
+    }
+
+    @Override
+    public void removeLike(Long filmId, Long userId) {
+        Film film = films.get(filmId);
+        if (film != null) {
+            film.getLikes().remove(userId);
+        } else {
+            throw new RuntimeException("Фильм с id=" + filmId + " не найден");
+        }
+    }
+
 }
