@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class RatingDbStorage implements RatingStorage{
+public class RatingDbStorage implements RatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
