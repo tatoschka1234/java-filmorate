@@ -8,6 +8,8 @@ import java.util.Set;
 
 public interface GenreStorage {
     List<Long> findExistingGenreIds(List<Long> ids);
+
     Map<Long, Set<Genre>> getGenresForFilms(List<Long> filmIds);
+
     Set<Genre> getGenresForFilm(Long filmId);
 }
