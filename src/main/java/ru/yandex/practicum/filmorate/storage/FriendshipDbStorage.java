@@ -47,12 +47,12 @@ public class FriendshipDbStorage implements FriendshipStorage {
 
     public List<User> getCommonFriends(Long userId, Long otherUserId) {
         String sql = """
-        SELECT u.*
-        FROM users AS u
-        INNER JOIN friendships AS f1 ON u.user_id = f1.friend_id
-        INNER JOIN friendships AS f2 ON u.user_id = f2.friend_id
-        WHERE f1.user_id = ? AND f2.user_id = ?
-    """;
+                    SELECT u.*
+                    FROM users AS u
+                    INNER JOIN friendships AS f1 ON u.user_id = f1.friend_id
+                    INNER JOIN friendships AS f2 ON u.user_id = f2.friend_id
+                    WHERE f1.user_id = ? AND f2.user_id = ?
+                """;
 
         return jdbcTemplate.query(sql, new UserRowMapper(), userId, otherUserId);
     }

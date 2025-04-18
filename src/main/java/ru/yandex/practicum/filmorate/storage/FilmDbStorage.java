@@ -70,36 +70,35 @@ public class FilmDbStorage implements FilmStorage {
     }
 
 
-public List<Film> getAllFilms() {
-    String sql = """
-        SELECT f.*, r.rating_id AS mpa_id, r.code AS mpa_name
-        FROM films f
-        LEFT JOIN ratings r ON f.rating_id = r.rating_id
-        """;
+    public List<Film> getAllFilms() {
+        String sql = """
+                SELECT f.*, r.rating_id AS mpa_id, r.code AS mpa_name
+                FROM films f
+                LEFT JOIN ratings r ON f.rating_id = r.rating_id
+                """;
 
-    List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper());
-    List<Long> filmIds = films.stream()
-            .map(Film::getId)
-            .toList();
+        List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper());
+        List<Long> filmIds = films.stream()
+                .map(Film::getId)
+                .toList();
 
-    Map<Long, Set<Genre>> genresMap = genreStorage.getGenresForFilms(filmIds);
-    for (Film film : films) {
-        film.setGenres(genresMap.getOrDefault(film.getId(), new HashSet<>()));
+        Map<Long, Set<Genre>> genresMap = genreStorage.getGenresForFilms(filmIds);
+        for (Film film : films) {
+            film.setGenres(genresMap.getOrDefault(film.getId(), new HashSet<>()));
+        }
+
+        return films;
     }
-
-    return films;
-}
-
 
 
     @Override
     public Film getFilm(Long id) {
         String sql = """
-        SELECT f.*, r.rating_id AS mpa_id, r.code AS mpa_name
-        FROM films f
-        LEFT JOIN ratings r ON f.rating_id = r.rating_id
-        WHERE f.film_id = ?
-    """;
+                    SELECT f.*, r.rating_id AS mpa_id, r.code AS mpa_name
+                    FROM films f
+                    LEFT JOIN ratings r ON f.rating_id = r.rating_id
+                    WHERE f.film_id = ?
+                """;
 
         Film film = jdbcTemplate.queryForObject(sql, new FilmRowMapper(), id);
         Map<Long, Set<Genre>> genreMap = genreStorage.getGenresForFilms(List.of(id));
@@ -109,21 +108,20 @@ public List<Film> getAllFilms() {
     }
 
 
-
     @Override
     public List<Film> getMostPopular(int count) {
         String sql = """
-        SELECT f.*, r.rating_id AS mpa_id, r.code AS mpa_name
-        FROM films f
-        LEFT JOIN ratings r ON f.rating_id = r.rating_id
-        LEFT JOIN (
-            SELECT film_id, COUNT(user_id) AS like_count
-            FROM likes
-            GROUP BY film_id
-        ) AS l ON f.film_id = l.film_id
-        ORDER BY COALESCE(l.like_count, 0) DESC
-        LIMIT ?
-    """;
+                    SELECT f.*, r.rating_id AS mpa_id, r.code AS mpa_name
+                    FROM films f
+                    LEFT JOIN ratings r ON f.rating_id = r.rating_id
+                    LEFT JOIN (
+                        SELECT film_id, COUNT(user_id) AS like_count
+                        FROM likes
+                        GROUP BY film_id
+                    ) AS l ON f.film_id = l.film_id
+                    ORDER BY COALESCE(l.like_count, 0) DESC
+                    LIMIT ?
+                """;
 
         List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper(), count);
 

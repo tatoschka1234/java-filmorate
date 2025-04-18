@@ -49,11 +49,11 @@ public class GenreDbStorage implements GenreStorage {
                 .collect(Collectors.joining(", "));
 
         String sql = """
-        SELECT fg.film_id, g.genre_id, g.name
-        FROM film_genres fg
-        JOIN genres g ON fg.genre_id = g.genre_id
-        WHERE fg.film_id IN (%s)
-        """.formatted(inSql);
+                SELECT fg.film_id, g.genre_id, g.name
+                FROM film_genres fg
+                JOIN genres g ON fg.genre_id = g.genre_id
+                WHERE fg.film_id IN (%s)
+                """.formatted(inSql);
 
         Map<Long, Set<Genre>> genresMap = new HashMap<>();
 
@@ -72,11 +72,11 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public Set<Genre> getGenresForFilm(Long filmId) {
         String sql = """
-        SELECT g.genre_id, g.name
-        FROM genres g
-        JOIN film_genres fg ON g.genre_id = fg.genre_id
-        WHERE fg.film_id = ?
-        """;
+                SELECT g.genre_id, g.name
+                FROM genres g
+                JOIN film_genres fg ON g.genre_id = fg.genre_id
+                WHERE fg.film_id = ?
+                """;
 
         return new HashSet<>(jdbcTemplate.query(sql, new GenreRowMapper(), filmId));
     }
