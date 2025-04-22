@@ -21,16 +21,14 @@ public class FriendshipDbStorage implements FriendshipStorage {
 
     @Override
     public boolean exists(Long userId, Long friendId) {
-        String sql = "SELECT COUNT(*) FROM friendships WHERE user_id = ? AND friend_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId, friendId);
-        return count != null && count > 0;
+        String sql = "SELECT EXISTS(SELECT 1 FROM friendships WHERE user_id = ? AND friend_id = ?)";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, userId, friendId));
     }
 
     @Override
     public boolean existsWithStatus(Long userId, Long friendId, String status) {
-        String sql = "SELECT COUNT(*) FROM friendships WHERE user_id = ? AND friend_id = ? AND status = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId, friendId, status);
-        return count != null && count > 0;
+        String sql = "SELECT EXISTS(SELECT 1 FROM friendships WHERE user_id = ? AND friend_id = ? AND status = ?)";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, userId, friendId, status));
     }
 
     @Override

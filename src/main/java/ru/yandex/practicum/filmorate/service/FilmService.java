@@ -8,16 +8,13 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.RatingStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 @Service
@@ -45,7 +42,7 @@ public class FilmService {
             throw new NotFoundException("Фильм с id=" + filmId + " не найден");
         }
         if (!userStorage.checkUserExists(userId)) {
-                throw new RuntimeException("юзер с id " + userId + " не найден");
+            throw new RuntimeException("юзер с id " + userId + " не найден");
         }
         filmStorage.addLike(filmId, userId);
     }
@@ -86,25 +83,6 @@ public class FilmService {
         log.debug("проверка фильма с id {}", film.getId());
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new ValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            List<Long> genreIds = film.getGenres().stream()
-                    .map(Genre::getId)
-                    .distinct()
-                    .toList();
-
-            Set<Long> foundIds = new HashSet<>(genreStorage.findExistingGenreIds(genreIds));
-
-            for (Long id : genreIds) {
-                if (!foundIds.contains(id)) {
-                    throw new NotFoundException("Жанр с id=" + id + " не найден");
-                }
-            }
-        }
-
-        if (film.getMpa() != null && !ratingStorage.existsById(film.getMpa().getId())) {
-            throw new NotFoundException("Рейтинг с id=" + film.getMpa().getId() + " не найден");
         }
     }
 }

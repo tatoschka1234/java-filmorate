@@ -30,14 +30,6 @@ public class GenreDbStorage implements GenreStorage {
         }
     }
 
-    public List<Long> findExistingGenreIds(List<Long> ids) {
-        if (ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        String inSql = String.join(",", Collections.nCopies(ids.size(), "?"));
-        String sql = "SELECT genre_id FROM genres WHERE genre_id IN (" + inSql + ")";
-        return jdbcTemplate.queryForList(sql, ids.toArray(), Long.class);
-    }
 
     public Map<Long, Set<Genre>> getGenresForFilms(List<Long> filmIds) {
         if (filmIds.isEmpty()) {
@@ -68,18 +60,5 @@ public class GenreDbStorage implements GenreStorage {
 
         return genresMap;
     }
-
-    @Override
-    public Set<Genre> getGenresForFilm(Long filmId) {
-        String sql = """
-                SELECT g.genre_id, g.name
-                FROM genres g
-                JOIN film_genres fg ON g.genre_id = fg.genre_id
-                WHERE fg.film_id = ?
-                """;
-
-        return new HashSet<>(jdbcTemplate.query(sql, new GenreRowMapper(), filmId));
-    }
-
 
 }

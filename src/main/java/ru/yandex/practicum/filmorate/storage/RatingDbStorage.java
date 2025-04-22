@@ -31,9 +31,8 @@ public class RatingDbStorage implements RatingStorage {
 
 
     public boolean existsById(Long id) {
-        String sql = "SELECT COUNT(*) FROM ratings WHERE rating_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
-        return count != null && count > 0;
+        String sql = "SELECT EXISTS(SELECT 1 FROM ratings WHERE rating_id = ?)";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, id));
     }
 }
 

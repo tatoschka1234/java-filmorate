@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,5 +38,13 @@ public class ErrorHandler {
         );
         return errors;
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleDataIntegrityViolation(DataIntegrityViolationException e) {
+        String message = "Ошибка целостности данных - возможно, указан несуществующий жанр или рейтинг)";
+        return Map.of("error", message);
+    }
+
 
 }

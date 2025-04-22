@@ -78,16 +78,7 @@ public class FilmDbStorage implements FilmStorage {
                 """;
 
         List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper());
-        List<Long> filmIds = films.stream()
-                .map(Film::getId)
-                .toList();
-
-        Map<Long, Set<Genre>> genresMap = genreStorage.getGenresForFilms(filmIds);
-        for (Film film : films) {
-            film.setGenres(genresMap.getOrDefault(film.getId(), new HashSet<>()));
-        }
-
-        return films;
+        return addGenresToFilms(films);
     }
 
 
@@ -107,25 +98,11 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
+    private List<Film> addGenresToFilms(List<Film> films) {
+        List<Long> filmIds = films.stream()
+                .map(Film::getId)
+                .toList();
 
-    @Override
-    public List<Film> getMostPopular(int count) {
-        String sql = """
-                    SELECT f.*, r.rating_id AS mpa_id, r.code AS mpa_name
-                    FROM films f
-                    LEFT JOIN ratings r ON f.rating_id = r.rating_id
-                    LEFT JOIN (
-                        SELECT film_id, COUNT(user_id) AS like_count
-                        FROM likes
-                        GROUP BY film_id
-                    ) AS l ON f.film_id = l.film_id
-                    ORDER BY COALESCE(l.like_count, 0) DESC
-                    LIMIT ?
-                """;
-
-        List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper(), count);
-
-        List<Long> filmIds = films.stream().map(Film::getId).toList();
         Map<Long, Set<Genre>> genresMap = genreStorage.getGenresForFilms(filmIds);
 
         for (Film film : films) {
@@ -133,6 +110,24 @@ public class FilmDbStorage implements FilmStorage {
         }
 
         return films;
+    }
+
+
+    @Override
+    public List<Film> getMostPopular(int count) {
+        String sql = """
+                SELECT f.*, r.rating_id AS mpa_id, r.code AS mpa_name,
+                    COUNT(l.user_id) AS like_count
+                FROM films f
+                LEFT JOIN ratings r ON f.rating_id = r.rating_id
+                LEFT JOIN likes l ON f.film_id = l.film_id
+                GROUP BY f.film_id, r.rating_id, r.code
+                ORDER BY like_count DESC
+                LIMIT ?
+                """;
+
+        List<Film> films = jdbcTemplate.query(sql, new FilmRowMapper(), count);
+        return addGenresToFilms(films);
     }
 
     private void insertGenres(Long filmId, Set<Genre> genres) {
@@ -166,9 +161,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public boolean checkFilmExists(Long id) {
-        String sql = "SELECT COUNT(*) FROM films WHERE film_id = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
-        return count != null && count > 0;
+        String sql = "SELECT EXISTS(SELECT 1 FROM films WHERE film_id = ?)";
+        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(sql, Boolean.class, id));
     }
 
 
